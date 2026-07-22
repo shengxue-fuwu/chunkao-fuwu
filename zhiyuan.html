@@ -1,0 +1,1162 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>春考志愿推荐</title>
+<style>
+:root {
+  --color-primary: #D91B5C;
+  --color-bg-page: #F5F6F8;
+  --color-bg-card: #FFFFFF;
+  --color-bg-disabled: #F3F4F6;
+  --color-text-primary: #1F2937;
+  --color-text-secondary: #6B7280;
+  --color-text-disabled: #9CA3AF;
+  --color-text-white: #FFFFFF;
+  --color-border: #E5E7EB;
+  --color-safe: #10B981;
+  --color-risk: #E11D48;
+  --color-warning: #FF9500;
+  --color-guarantee: #3B82F6;
+  --radius-card: 16px;
+  --radius-button: 16px;
+  --radius-pill: 999px;
+  --radius-tag: 8px;
+  --radius-input: 10px;
+  --shadow-card: 0 2px 12px rgba(0,0,0,0.05);
+  --shadow-tabbar: 0 -2px 12px rgba(0,0,0,0.06);
+  --spacing-page-x: 16px;
+  --spacing-card-padding: 20px;
+  --font-size-body: 14px;
+  --font-size-caption: 12px;
+  --font-weight-bold: 700;
+  --font-weight-semibold: 600;
+  --font-weight-medium: 500;
+  --height-tabbar: 60px;
+  --height-input: 44px;
+  --height-button-lg: 48px;
+  --backdrop-blur: blur(10px);
+}
+
+html{-webkit-text-size-adjust:100%;}
+body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Helvetica Neue",Arial,sans-serif;background:var(--color-bg-page);color:var(--color-text-primary);min-height:100vh;font-size:var(--font-size-body);}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+a{text-decoration:none;color:inherit;}
+
+.page-body{padding:0 var(--spacing-page-x) calc(var(--height-tabbar)+80px);position:relative;z-index:10;}
+@media(min-width:600px){.page-body{max-width:600px;margin:0 auto;padding:0 0 calc(var(--height-tabbar)+80px);}}
+
+.hero{padding:20px 0 10px;text-align:center;}
+.hero-title{font-size:18px;font-weight:var(--font-weight-bold);color:var(--color-text-primary);margin-bottom:6px;letter-spacing:-.5px;}
+.hero-sub{font-size:var(--font-size-body);color:var(--color-text-secondary);line-height:1.6;}
+
+.info-card{background:var(--color-bg-card);border-radius:var(--radius-card);padding:var(--spacing-card-padding);box-shadow:var(--shadow-card);margin:16px 0 10px;}
+.info-card-title{font-size:var(--font-size-body);font-weight:var(--font-weight-bold);color:var(--color-text-primary);margin-bottom:14px;display:flex;align-items:center;gap:6px;}
+.info-card-title::before{content:'';display:inline-block;width:3px;height:14px;background:var(--color-primary);border-radius:3px;flex-shrink:0;}
+.form-row{margin-bottom:14px;}
+.form-label{font-size:var(--font-size-caption);color:var(--color-text-secondary);font-weight:var(--font-weight-semibold);margin-bottom:6px;}
+.form-input,.form-select{width:100%;height:var(--height-input);padding:0 14px;border-radius:var(--radius-input);border:1px solid var(--color-border);font-size:var(--font-size-body);color:var(--color-text-primary);background:var(--color-bg-disabled);outline:none;transition:border-color .2s,background .2s;-webkit-appearance:none;appearance:none;}
+.form-select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;background-color:var(--color-bg-disabled);padding-right:32px;cursor:pointer;}
+.form-input:focus,.form-select:focus{border-color:var(--color-primary);background:var(--color-bg-card);}
+.form-input::placeholder{color:var(--color-text-disabled);}
+.form-hint{font-size:var(--font-size-caption);color:var(--color-text-disabled);margin-top:5px;line-height:1.5;}
+.section-divider{height:1px;background:var(--color-bg-disabled);margin:4px 0 14px;}
+
+.lx-title{font-size:var(--font-size-caption);color:var(--color-text-secondary);font-weight:var(--font-weight-semibold);margin-bottom:10px;}
+.lx-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;}
+.lx-card{border:2px solid var(--color-border);border-radius:var(--radius-card);padding:14px 12px;cursor:pointer;transition:all .2s;background:var(--color-bg-card);display:flex;flex-direction:column;gap:4px;position:relative;overflow:hidden;}
+.lx-card:active{transform:scale(.97);}
+.lx-card.selected{border-color:var(--color-primary);background:rgba(217,27,92,0.05);}
+.lx-card.lx-card-disabled{cursor:not-allowed;opacity:.5;filter:grayscale(.3);}
+.lx-card.lx-card-disabled:active{transform:none;}
+.lx-card .lx-check{position:absolute;top:8px;right:8px;width:18px;height:18px;border-radius:50%;background:var(--color-primary);color:var(--color-text-white);font-size:10px;font-weight:var(--font-weight-bold);display:none;align-items:center;justify-content:center;}
+.lx-card.selected .lx-check{display:flex;}
+.lx-card-icon{font-size:22px;line-height:1;}
+.lx-card-name{font-size:var(--font-size-body);font-weight:var(--font-weight-bold);color:var(--color-text-primary);}
+.lx-card-desc{font-size:var(--font-size-caption);color:var(--color-text-disabled);line-height:1.4;}
+
+.fab-smart{position:fixed;left:50%;bottom:calc(var(--height-tabbar) + 60px);transform:translateX(-50%);z-index:200;width:60%;max-width:572px;height:var(--height-button-lg);border-radius:var(--radius-button);background:var(--color-primary);color:var(--color-text-white);border:none;font-size:var(--font-size-body);font-weight:var(--font-weight-semibold);box-shadow:0 6px 24px rgba(217,27,92,0.3);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:transform .15s,box-shadow .15s;}
+.fab-smart:active{transform:translateX(-50%) scale(.97);}
+.fab-smart-icon{font-size:18px;}
+
+#resultSection{display:none;}
+
+.result-outer{background:linear-gradient(135deg, var(--color-primary) 0%, #E11D48 100%);border-radius:var(--radius-card);padding:10px 5px 5px 5px;box-shadow:0 4px 20px rgba(217,27,92,0.3);margin:16px 0 10px;}
+.result-bar{display:flex;align-items:center;gap:10px;padding-bottom:8px;}
+.result-bar-body{flex:1;min-width:0;margin-left:5px;}
+.result-bar-main{font-size:var(--font-size-caption);font-weight:var(--font-weight-bold);color:var(--color-text-white);line-height:1.4;letter-spacing:-.2px;}
+.result-bar-edit{font-size:var(--font-size-caption);color:var(--color-text-white);border:1.5px solid rgba(255,255,255,.55);border-radius:var(--radius-pill);padding:2px 15px;cursor:pointer;background:rgba(255,255,255,.15);white-space:nowrap;flex-shrink:0;font-weight:var(--font-weight-bold);backdrop-filter:blur(4px);}
+
+.filter-card{background:var(--color-bg-card);border-radius:var(--radius-card);padding:12px 14px;box-shadow:var(--shadow-card);}
+.filter-row{display:flex;gap:8px;align-items:center;margin-bottom:8px;}
+.filter-row:last-child{margin-bottom:0;}
+.filter-label{font-size:var(--font-size-caption);color:var(--color-text-disabled);font-weight:var(--font-weight-semibold);white-space:nowrap;flex-shrink:0;}
+.filter-chips{display:flex;gap:6px;flex-wrap:wrap;}
+.filter-chips-scroll{display:flex;gap:6px;flex:1;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+.filter-chips-scroll::-webkit-scrollbar{display:none;}
+.chip{padding:4px 12px;border-radius:var(--radius-pill);font-size:var(--font-size-caption);font-weight:var(--font-weight-semibold);border:1.5px solid var(--color-border);color:var(--color-text-secondary);cursor:pointer;transition:all .15s;background:var(--color-bg-card);white-space:nowrap;flex-shrink:0;}
+.chip.active{background:var(--color-primary);color:var(--color-text-white);border-color:var(--color-primary);}
+.chip:active{opacity:.8;}
+
+.cwb-tabs{display:flex;gap:8px;margin-bottom:12px;}
+.cwb-tab{flex:1;height:54px;border-radius:var(--radius-card);border:2px solid var(--color-border);background:var(--color-bg-card);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;transition:all .2s;}
+.cwb-tab:active{transform:scale(.96);}
+.cwb-tab-label{font-size:var(--font-size-caption);color:var(--color-text-secondary);font-weight:var(--font-weight-semibold);}
+.cwb-tab-count{font-size:18px;font-weight:var(--font-weight-bold);color:var(--color-text-primary);}
+.cwb-tab.tab-chong.active{background:rgba(225,29,72,0.05);border-color:var(--color-risk);}
+.cwb-tab.tab-chong.active .cwb-tab-label{color:var(--color-risk);}
+.cwb-tab.tab-chong.active .cwb-tab-count{color:var(--color-risk);}
+.cwb-tab.tab-wen.active{background:rgba(255,149,0,0.05);border-color:var(--color-warning);}
+.cwb-tab.tab-wen.active .cwb-tab-label{color:var(--color-warning);}
+.cwb-tab.tab-wen.active .cwb-tab-count{color:var(--color-warning);}
+.cwb-tab.tab-bao.active{background:rgba(16,185,129,0.05);border-color:var(--color-safe);}
+.cwb-tab.tab-bao.active .cwb-tab-label{color:var(--color-safe);}
+.cwb-tab.tab-bao.active .cwb-tab-count{color:var(--color-safe);}
+
+.school-card{background:var(--color-bg-card);border-radius:var(--radius-card);padding:14px;box-shadow:var(--shadow-card);margin-bottom:10px;display:flex;gap:12px;}
+.school-logo{width:48px;height:48px;border-radius:var(--radius-tag);flex-shrink:0;background:var(--color-bg-disabled);overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--color-text-disabled);border:1px solid var(--color-border);}
+.school-logo img{width:100%;height:100%;object-fit:cover;}
+.school-main{flex:1;min-width:0;}
+.school-name-row{display:flex;align-items:center;gap:6px;margin-bottom:4px;flex-wrap:wrap;}
+.school-name{font-size:var(--font-size-body);font-weight:var(--font-weight-bold);color:var(--color-text-primary);}
+.school-badge{font-size:10px;padding:2px 7px;border-radius:var(--radius-tag);font-weight:var(--font-weight-semibold);white-space:nowrap;}
+.school-badge.gongban{background:rgba(59,130,246,0.05);color:var(--color-guarantee);}
+.school-badge.minban{background:rgba(139,92,246,0.05);color:#8B5CF6;}
+.school-zy{font-size:var(--font-size-body);color:var(--color-primary);line-height:1.5;font-weight:var(--font-weight-bold);padding:15px 10px 5px 10px;}
+.school-info-box{background:var(--color-bg-disabled);border-radius:var(--radius-input);margin-top:8px;overflow:hidden;}
+.school-meta{display:flex;gap:0;padding:8px 0;}
+.school-stat{flex:1;text-align:center;}
+.school-stat+.school-stat{border-left:1px solid var(--color-border);}
+.school-stat-val{font-size:var(--font-size-body);font-weight:var(--font-weight-bold);color:var(--color-text-primary);}
+.school-stat-key{font-size:var(--font-size-caption);color:var(--color-text-disabled);margin-top:3px;}
+.school-tags{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px;}
+.school-tag{font-size:var(--font-size-caption);padding:2px 7px;border-radius:var(--radius-tag);background:var(--color-bg-disabled);color:var(--color-text-secondary);font-weight:var(--font-weight-semibold);}
+
+.add-btn-wrap{margin-top:10px;display:flex;align-items:center;gap:8px;}
+.add-btn{flex:1;height:36px;border-radius:var(--radius-button);border:none;font-size:var(--font-size-caption);font-weight:var(--font-weight-bold);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;transition:all .15s;}
+.add-btn:active{opacity:.85;}
+.add-btn.tag-chong{background:var(--color-risk);color:var(--color-text-white);}
+.add-btn.tag-wen{background:var(--color-warning);color:var(--color-text-primary);}
+.add-btn.tag-bao{background:var(--color-safe);color:var(--color-text-white);}
+.add-btn.added{background:var(--color-text-secondary)!important;color:var(--color-text-white);}
+.add-btn-inner-tag{font-size:10px;padding:2px 6px;border-radius:var(--radius-tag);font-weight:var(--font-weight-bold);background:rgba(255,255,255,.25);}
+.vr-btn{height:36px;padding:0 12px;border-radius:var(--radius-button);border:none;font-size:var(--font-size-caption);font-weight:var(--font-weight-bold);cursor:pointer;white-space:nowrap;flex-shrink:0;background:var(--color-bg-disabled);color:var(--color-primary);display:flex;align-items:center;gap:4px;transition:background .15s;text-decoration:none;}
+.vr-btn:active{background:var(--color-border);}
+
+.kw-tag-wrap{display:flex;flex-wrap:wrap;align-items:center;gap:5px;min-height:36px;padding:5px 10px 5px 32px;border-radius:var(--radius-input);border:1.5px solid var(--color-border);background:var(--color-bg-disabled);margin-top:15px;position:relative;cursor:text;transition:border-color .2s,background .2s;}
+.kw-tag-wrap:focus-within{border-color:var(--color-primary);background:var(--color-bg-card);}
+.filter-search-icon{position:absolute;left:10px;top:10px;font-size:13px;color:var(--color-text-disabled);pointer-events:none;}
+.kw-tag-input{border:none;outline:none;background:transparent;font-size:var(--font-size-caption);color:var(--color-text-primary);min-width:100px;flex:1;height:24px;padding:0;}
+.kw-tag-input::placeholder{color:var(--color-text-disabled);}
+.kw-pill{display:inline-flex;align-items:center;gap:3px;background:var(--color-primary);color:var(--color-text-white);border-radius:var(--radius-pill);font-size:var(--font-size-caption);font-weight:var(--font-weight-semibold);padding:2px 8px 2px 10px;white-space:nowrap;}
+.kw-pill-x{width:14px;height:14px;border-radius:50%;background:rgba(255,255,255,.3);color:var(--color-text-white);font-size:9px;font-weight:var(--font-weight-bold);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:0;line-height:1;}
+.kw-pill-x:hover{background:rgba(255,255,255,.5);}
+
+.active-filters{display:none;flex-wrap:wrap;gap:5px;margin-top:8px;}
+.active-filters.show{display:flex;}
+.af-tag{display:inline-flex;align-items:center;gap:3px;font-size:var(--font-size-caption);padding:3px 8px 3px 10px;border-radius:var(--radius-pill);font-weight:var(--font-weight-semibold);background:rgba(217,27,92,0.05);color:var(--color-primary);border:1px solid rgba(217,27,92,0.2);cursor:default;}
+.af-tag-x{width:14px;height:14px;border-radius:50%;background:var(--color-primary);color:var(--color-text-white);font-size:9px;font-weight:var(--font-weight-bold);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:0;line-height:1;}
+
+.g-loading{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:40px 16px;color:var(--color-text-disabled);font-size:var(--font-size-body);}
+.g-spin{width:24px;height:24px;border:2px solid var(--color-border);border-top-color:var(--color-primary);border-radius:50%;animation:gspin .6s linear infinite;}
+@keyframes gspin{to{transform:rotate(360deg);}}
+.g-empty{text-align:center;padding:40px 16px;color:var(--color-text-disabled);font-size:var(--font-size-body);}
+.g-bkx-block{text-align:center;padding:32px 20px 24px;display:flex;flex-direction:column;align-items:center;gap:12px;}
+.g-bkx-title{font-size:var(--font-size-body);font-weight:var(--font-weight-bold);color:var(--color-text-primary);}
+.g-bkx-sub{font-size:var(--font-size-body);color:var(--color-text-secondary);line-height:1.6;}
+.g-bkx-qr img{width:140px;height:140px;border-radius:var(--radius-card);border:1px solid var(--color-border);}
+.g-bkx-qr-tip{font-size:var(--font-size-caption);color:var(--color-text-disabled);margin-top:6px;}
+
+.disclaimer-bar{font-size:var(--font-size-caption);color:var(--color-text-disabled);line-height:1.6;padding:6px 10px;background:rgba(255,204,51,0.1);border-radius:var(--radius-tag);border:1px solid rgba(255,204,51,0.3);margin-bottom:10px;display:flex;align-items:flex-start;gap:5px;}
+.disclaimer-bar::before{content:'⚠️';flex-shrink:0;font-size:12px;}
+
+
+
+.coming-modal-overlay{display:none;position:fixed;inset:0;z-index:800;background:rgba(0,0,0,.5);-webkit-backdrop-filter:blur(5px);backdrop-filter:blur(5px);}
+.coming-modal-overlay.show{display:flex;align-items:center;justify-content:center;padding:20px;}
+.coming-modal-box{background:var(--color-bg-card);border-radius:var(--radius-card);width:100%;max-width:320px;padding:28px 22px 22px;box-shadow:0 8px 40px rgba(0,0,0,.2);text-align:center;}
+.coming-modal-icon{font-size:36px;margin-bottom:10px;}
+.coming-modal-title{font-size:18px;font-weight:var(--font-weight-bold);color:var(--color-text-primary);margin-bottom:6px;}
+.coming-modal-sub{font-size:var(--font-size-body);color:var(--color-text-secondary);line-height:1.6;margin-bottom:16px;}
+.coming-modal-qr img{width:148px;height:148px;border-radius:var(--radius-card);border:1px solid var(--color-border);}
+.coming-modal-close{width:100%;height:36px;border-radius:var(--radius-button);border:1.5px solid var(--color-border);background:var(--color-bg-card);font-size:var(--font-size-body);color:var(--color-text-secondary);cursor:pointer;margin-top:16px;}
+.coming-modal-close:active{background:var(--color-bg-disabled);}
+
+.list-lock-banner{background:var(--color-bg-card);border-radius:var(--radius-card);padding:24px 16px;box-shadow:var(--shadow-card);margin-bottom:10px;text-align:center;}
+.list-lock-banner-title{font-size:var(--font-size-body);font-weight:var(--font-weight-bold);color:var(--color-text-primary);margin-bottom:6px;}
+.list-lock-banner-sub{font-size:var(--font-size-body);color:var(--color-text-secondary);margin-bottom:14px;line-height:1.5;}
+.list-lock-banner-qr img{width:130px;height:130px;border-radius:var(--radius-card);border:1px solid var(--color-border);margin:0 auto 8px;display:block;}
+.list-lock-banner-qr-tip{font-size:var(--font-size-caption);color:var(--color-text-disabled);}
+.list-lock-banner-btn{display:inline-block;margin-top:14px;height:36px;padding:0 28px;border-radius:var(--radius-button);background:var(--color-primary);color:var(--color-text-white);font-size:var(--font-size-body);font-weight:var(--font-weight-semibold);border:none;cursor:pointer;}
+
+.pager{display:flex;align-items:center;justify-content:center;gap:6px;padding:14px 0;flex-wrap:wrap;}
+.page-btn{min-width:34px;height:34px;border-radius:var(--radius-tag);border:1.5px solid var(--color-border);background:var(--color-bg-card);font-size:var(--font-size-body);color:var(--color-text-primary);cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0 8px;transition:all .2s;}
+.page-btn.active{background:var(--color-primary);color:var(--color-text-white);border-color:var(--color-primary);}
+.page-btn:disabled{opacity:.4;cursor:default;}
+.page-info-text{font-size:var(--font-size-caption);color:var(--color-text-disabled);}
+
+.fab-wish{position:fixed;right:16px;bottom:calc(var(--height-tabbar) + 18px);z-index:200;width:54px;height:54px;border-radius:50%;background:var(--color-primary);color:var(--color-text-white);box-shadow:0 4px 16px rgba(217,27,92,0.3);display:none;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;gap:2px;transition:transform .2s;}
+.fab-wish.show{display:flex;}
+.fab-wish:active{transform:scale(.92);}
+.fab-wish-badge{position:absolute;top:-4px;right:-4px;min-width:18px;height:18px;border-radius:9px;background:var(--color-risk);color:var(--color-text-white);font-size:10px;font-weight:var(--font-weight-bold);display:none;align-items:center;justify-content:center;padding:0 4px;}
+
+.wish-sheet-overlay{display:none;position:fixed;inset:0;z-index:600;background:rgba(0,0,0,.3);-webkit-backdrop-filter:blur(6px) brightness(.75);backdrop-filter:blur(6px) brightness(.75);opacity:0;transition:opacity .3s;}
+.wish-sheet-overlay.show{display:flex;align-items:flex-end;justify-content:center;}
+.wish-sheet-overlay.visible{opacity:1;}
+.wish-sheet{background:var(--color-bg-page);border-radius:var(--radius-card) var(--radius-card) 0 0;width:100%;max-width:500px;max-height:82vh;display:flex;flex-direction:column;transform:translateY(100%);transition:transform .35s cubic-bezier(.32,.72,0,1);}
+.wish-sheet-overlay.visible .wish-sheet{transform:translateY(0);}
+.wish-sheet-bar{display:flex;justify-content:center;padding:10px 0 4px;flex-shrink:0;}
+.wish-sheet-bar i{width:36px;height:4px;border-radius:4px;background:var(--color-border);display:block;}
+.wish-sheet-head{display:flex;justify-content:space-between;align-items:center;padding:0 16px 12px;flex-shrink:0;border-bottom:1px solid var(--color-border);background:var(--color-bg-page);}
+.wish-sheet-title{font-size:var(--font-size-body);font-weight:var(--font-weight-bold);color:var(--color-text-primary);}
+.wish-sheet-export{font-size:var(--font-size-body);color:var(--color-primary);cursor:pointer;padding:4px;font-weight:var(--font-weight-semibold);}
+.wish-sheet-clear{font-size:var(--font-size-body);color:var(--color-risk);cursor:pointer;padding:4px;}
+.wish-list{flex:1;overflow-y:auto;padding:12px 12px 4px;}
+.wish-item{background:var(--color-bg-card);border-radius:var(--radius-card);padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:10px;box-shadow:var(--shadow-card);}
+.wish-order{width:22px;height:22px;border-radius:50%;background:var(--color-primary);color:var(--color-text-white);font-size:11px;font-weight:var(--font-weight-bold);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.wish-info{flex:1;min-width:0;}
+.wish-xx{font-size:var(--font-size-body);font-weight:var(--font-weight-bold);color:var(--color-text-primary);}
+.wish-zy{font-size:var(--font-size-caption);color:var(--color-text-secondary);margin-top:2px;}
+.wish-tag-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.wish-tag-dot.chong{background:var(--color-risk);}
+.wish-tag-dot.wen{background:var(--color-warning);}
+.wish-tag-dot.bao{background:var(--color-safe);}
+.wish-remove-btn{font-size:var(--font-size-caption);color:var(--color-risk);border:1px solid rgba(225,29,72,0.3);border-radius:var(--radius-tag);padding:3px 8px;cursor:pointer;background:none;white-space:nowrap;flex-shrink:0;}
+.wish-empty{text-align:center;padding:40px 16px;color:var(--color-text-disabled);font-size:var(--font-size-body);}
+.wish-sheet-footer{padding:12px 12px 30px;flex-shrink:0;background:var(--color-bg-page);display:flex;gap:10px;}
+.wish-close-btn{flex:1;height:var(--height-button-lg);border-radius:var(--radius-button);border:none;background:var(--color-primary);color:var(--color-text-white);font-size:var(--font-size-body);font-weight:var(--font-weight-semibold);cursor:pointer;}
+.wish-export-btn{flex:1;height:var(--height-button-lg);border-radius:var(--radius-button);border:1.5px solid var(--color-primary);background:var(--color-bg-card);color:var(--color-primary);font-size:var(--font-size-body);font-weight:var(--font-weight-semibold);cursor:pointer;}
+.wish-export-btn:active{background:rgba(217,27,92,0.05);}
+
+.hd{height:48px;padding:0 var(--spacing-page-x);position:sticky;top:0;z-index:100;background:rgba(255,255,255,0.9);backdrop-filter:var(--backdrop-blur);display:flex;align-items:center;justify-content:center;}
+.hd-title{font-size:16px;font-weight:var(--font-weight-bold);color:var(--color-text-primary);}
+@media(min-width:600px){.hd{max-width:600px;margin:0 auto;}}
+
+.bnav{position:fixed;bottom:3%;left:50%;transform:translateX(-50%);width:calc(100% - 100px);max-width:460px;height:var(--height-tabbar);background:rgba(255,255,255,0.9);backdrop-filter:var(--backdrop-blur);border-radius:var(--radius-pill);box-shadow:var(--shadow-tabbar);display:flex;align-items:center;z-index:200;padding:0 4px;}
+.bnav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:6px 2px;border-radius:14px;color:var(--color-text-primary);}
+.bnav-item:active{background:rgba(0,0,0,.04);}
+.bnav-icon{font-size:20px;line-height:1;}
+.bnav-name{font-size:9px;color:var(--color-text-secondary);font-weight:var(--font-weight-bold);}
+.bnav-item.active .bnav-name{color:var(--color-primary);}
+@media(min-width:600px){.bnav{max-width:400px;}}
+
+.consult-overlay{display:none;position:fixed;inset:0;z-index:999;-webkit-backdrop-filter:blur(8px) brightness(.7);backdrop-filter:blur(8px) brightness(.7);background:rgba(0,0,0,.3);transition:opacity .3s;opacity:0;}
+.consult-overlay.show{display:flex;align-items:center;justify-content:center;padding:20px;}
+.consult-overlay.visible{opacity:1;}
+.consult-box{background:var(--color-bg-card);border-radius:var(--radius-card);width:calc(100% - 48px);max-width:360px;padding:24px 20px;transform:scale(.92);transition:transform .3s cubic-bezier(.32,.72,0,1);}
+.consult-overlay.visible .consult-box{transform:scale(1);}
+.consult-title{font-size:16px;font-weight:var(--font-weight-bold);color:var(--color-text-primary);margin-bottom:12px;text-align:center;}
+.consult-text{font-size:var(--font-size-body);color:var(--color-text-secondary);line-height:1.7;margin-bottom:16px;text-align:center;}
+.consult-qr{width:140px;height:140px;border-radius:var(--radius-tag);display:block;margin:0 auto;border:1px solid var(--color-border);background:var(--color-bg-disabled);}
+.consult-hint{font-size:var(--font-size-caption);color:var(--color-text-disabled);text-align:center;margin-top:8px;}
+.consult-close{width:30px;height:30px;border-radius:50%;border:none;background:var(--color-bg-disabled);color:var(--color-text-secondary);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;margin:16px auto 0;transition:background .15s;}
+.consult-close:active{background:var(--color-border);}
+
+</style>
+</head>
+<body>
+
+<header class="hd">
+    <div class="hd-title">春考志愿推荐</div>
+</header>
+
+<div class="page-body">
+    <div id="formSection">
+        <div class="hero">
+            <div class="hero-title">春考志愿推荐系统</div>
+            <div class="hero-sub">输入分数和位次，推荐冲稳保院校专业</div>
+        </div>
+
+        <div class="info-card">
+            <div class="info-card-title">填写考试信息</div>
+
+            <div class="form-row">
+                <div class="form-label">春考类别</div>
+                <select class="form-select" id="uLb">
+                    <option value="">请选择科目类别</option>
+                    <option value="现代农艺">现代农艺</option>
+                    <option value="烹饪">烹饪</option>
+                    <option value="畜牧养殖">畜牧养殖</option>
+                    <option value="建筑">建筑</option>
+                    <option value="机械制造">机械制造</option>
+                    <option value="设备维修">设备维修</option>
+                    <option value="机电技术">机电技术</option>
+                    <option value="自动控制">自动控制</option>
+                    <option value="电气技术">电气技术</option>
+                    <option value="电子技术">电子技术</option>
+                    <option value="化工与环境">化工与环境</option>
+                    <option value="服装">服装</option>
+                    <option value="车辆维修">车辆维修</option>
+                    <option value="运输">运输</option>
+                    <option value="数字媒体">数字媒体</option>
+                    <option value="网络技术">网络技术</option>
+                    <option value="软件与应用技术">软件与应用技术</option>
+                    <option value="医学技术">医学技术</option>
+                    <option value="药学">药学</option>
+                    <option value="护理">护理</option>
+                    <option value="财税">财税</option>
+                    <option value="市场营销">市场营销</option>
+                    <option value="电子商务">电子商务</option>
+                    <option value="国际商务">国际商务</option>
+                    <option value="物流管理">物流管理</option>
+                    <option value="酒店管理">酒店管理</option>
+                    <option value="旅游管理">旅游管理</option>
+                    <option value="公共服务与管理">公共服务与管理</option>
+                    <option value="学前教育">学前教育</option>
+                    <option value="艺术设计">艺术设计</option>
+                </select>
+            </div>
+
+            <div class="form-row">
+                <div class="form-label">春考成绩</div>
+                <input class="form-input" id="uFs" type="number" min="0" max="750" placeholder="请输入分数（0–750）" inputmode="numeric">
+            </div>
+
+            <div class="form-row">
+                <div class="form-label">全省位次</div>
+                <input class="form-input" id="uWc" type="number" min="1" placeholder="请输入全省排名" inputmode="numeric">
+                <div class="form-hint" style="color:red;">位次是志愿推荐的核心依据，请认真填写</div>
+            </div>
+
+            <div class="section-divider"></div>
+
+            <div class="lx-title">选择志愿类别</div>
+            <div class="lx-grid">
+                <div class="lx-card lx-card-disabled" data-lx="1" onclick="openComingModal()" style="cursor:pointer;">
+                    <div class="lx-check">✓</div>
+                    <div class="lx-card-name">春考本科</div>
+                    <div class="lx-card-desc">已结束</div>
+                </div>
+                <div class="lx-card" data-lx="2" onclick="toggleLx(this)">
+                    <div class="lx-check">✓</div>
+                    <div class="lx-card-name">春考专科</div>
+                    <div class="lx-card-desc">面向春季高考专科</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="resultSection">
+        <div class="result-outer">
+            <div class="result-bar">
+                <div class="result-bar-body">
+                    <div class="result-bar-main"><span id="rBarMain"></span><span id="rBarSub"></span></div>
+                </div>
+                <button class="result-bar-edit" onclick="backToForm()">修改</button>
+            </div>
+            <div class="filter-card" id="filterCard">
+            <div class="filter-row">
+                <span class="filter-label">属性</span>
+                <div class="filter-chips">
+                    <span class="chip active" data-t1="" onclick="setChip(this,'t1')">全部</span>
+                    <span class="chip" data-t1="1" onclick="setChip(this,'t1')">公办</span>
+                    <span class="chip" data-t1="2" onclick="setChip(this,'t1')">民办</span>
+                </div>
+            </div>
+            <div class="filter-row">
+                <span class="filter-label">城市</span>
+                <div class="filter-chips-scroll" id="csChips">
+                    <span class="chip active" data-cs="" onclick="setChip(this,'cs')">全部</span>
+                    <span class="chip" data-cs="济南" onclick="setChip(this,'cs')">济南</span>
+                    <span class="chip" data-cs="青岛" onclick="setChip(this,'cs')">青岛</span>
+                    <span class="chip" data-cs="淄博" onclick="setChip(this,'cs')">淄博</span>
+                    <span class="chip" data-cs="枣庄" onclick="setChip(this,'cs')">枣庄</span>
+                    <span class="chip" data-cs="东营" onclick="setChip(this,'cs')">东营</span>
+                    <span class="chip" data-cs="烟台" onclick="setChip(this,'cs')">烟台</span>
+                    <span class="chip" data-cs="潍坊" onclick="setChip(this,'cs')">潍坊</span>
+                    <span class="chip" data-cs="济宁" onclick="setChip(this,'cs')">济宁</span>
+                    <span class="chip" data-cs="泰安" onclick="setChip(this,'cs')">泰安</span>
+                    <span class="chip" data-cs="威海" onclick="setChip(this,'cs')">威海</span>
+                    <span class="chip" data-cs="日照" onclick="setChip(this,'cs')">日照</span>
+                    <span class="chip" data-cs="临沂" onclick="setChip(this,'cs')">临沂</span>
+                    <span class="chip" data-cs="德州" onclick="setChip(this,'cs')">德州</span>
+                    <span class="chip" data-cs="聊城" onclick="setChip(this,'cs')">聊城</span>
+                    <span class="chip" data-cs="滨州" onclick="setChip(this,'cs')">滨州</span>
+                    <span class="chip" data-cs="菏泽" onclick="setChip(this,'cs')">菏泽</span>
+                </div>
+            </div>
+            <div class="filter-row">
+                <span class="filter-label">更多</span>
+                <div class="filter-chips-scroll" id="moreChipsRow"></div>
+            </div>
+            <div class="kw-tag-wrap" id="kwTagWrap">
+                <span class="filter-search-icon">🔍</span>
+                <div class="kw-tags" id="kwTags"></div>
+                <input class="kw-tag-input" id="kw" type="text" placeholder="输入关键词回车添加…" autocomplete="off">
+            </div>
+            <div class="active-filters" id="activeFilters"></div>
+        </div>
+        </div>
+
+        <div class="disclaimer-bar">每年分数变动大、新增招生专业多，无数据参考数据多，推荐结果仅供参考，不对最终录取结果负责。</div>
+
+        <div class="cwb-tabs">
+            <div class="cwb-tab tab-chong active" data-tab="chong" onclick="setCwbTab(this)">
+                <div class="cwb-tab-count" id="countChong">0</div>
+                <div class="cwb-tab-label">冲专业</div>
+            </div>
+            <div class="cwb-tab tab-wen" data-tab="wen" onclick="setCwbTab(this)">
+                <div class="cwb-tab-count" id="countWen">0</div>
+                <div class="cwb-tab-label">稳专业</div>
+            </div>
+            <div class="cwb-tab tab-bao" data-tab="bao" onclick="setCwbTab(this)">
+                <div class="cwb-tab-count" id="countBao">0</div>
+                <div class="cwb-tab-label">保专业</div>
+            </div>
+        </div>
+
+        <div id="schoolList"></div>
+        <div id="pagerWrap"></div>
+    </div>
+
+</div>
+
+<button class="fab-smart" id="fabSmart" onclick="doSmartBao()">
+    <span class="fab-smart-icon">✨</span>
+    <span>一键智能填报</span>
+</button>
+
+<div class="fab-wish" id="fabWish" onclick="openWishSheet()">
+    <div style="font-size:20px;line-height:1;">📋</div>
+    <div style="font-size:10px;font-weight:600;">我的志愿</div>
+    <div class="fab-wish-badge" id="fabBadge"></div>
+</div>
+
+<div class="wish-sheet-overlay" id="wishSheetOverlay">
+    <div class="wish-sheet">
+        <div class="wish-sheet-bar"><i></i></div>
+        <div class="wish-sheet-head">
+            <span class="wish-sheet-title">我的志愿</span>
+            <div style="display:flex;align-items:center;gap:10px;">
+                <span class="wish-sheet-export" onclick="exportWish()">导出志愿表</span>
+                <span class="wish-sheet-clear" onclick="clearAllWish()">清空</span>
+            </div>
+        </div>
+        <div class="wish-list" id="wishListEl"></div>
+        <div class="wish-sheet-footer">
+            <button class="wish-close-btn" onclick="closeWishSheet()">关闭</button>
+            <button class="wish-export-btn" onclick="exportWish()">导出志愿表</button>
+        </div>
+    </div>
+</div>
+
+<div class="coming-modal-overlay" id="comingModalOverlay" onclick="if(event.target===this)closeComingModal()">
+    <div class="coming-modal-box">
+        <div class="coming-modal-icon">🚀</div>
+        <div class="coming-modal-title">已结束</div>
+        <div class="coming-modal-sub">春考本科志愿推荐系统已关闭</div>
+        <div class="coming-modal-qr" id="comingModalQr"></div>
+        <button class="coming-modal-close" onclick="closeComingModal()">我知道了</button>
+    </div>
+</div>
+
+<div class="coming-modal-overlay" id="endedModalOverlay">
+    <div class="coming-modal-box">
+        <div class="coming-modal-icon">⚠️</div>
+        <div class="coming-modal-title">志愿填报已结束</div>
+        <div class="coming-modal-sub" id="endedModalSub">您原先选择的志愿类别已结束，请修改用户信息并重新选择。</div>
+        <button class="coming-modal-close" onclick="closeEndedModal()">返回修改用户信息</button>
+    </div>
+</div>
+
+
+
+
+
+<nav class="bnav">
+    <a class="bnav-item" href="index.html">
+        <span class="bnav-icon">🏠</span>
+        <span class="bnav-name">首页</span>
+    </a>
+    <a class="bnav-item" href="javascript:;" onclick="openConsult('一对一志愿', '专业志愿填报指导，扫描二维码获取个性化推荐方案')">
+        <span class="bnav-icon">🎯</span>
+        <span class="bnav-name">一对一志愿</span>
+    </a>
+    <a class="bnav-item" href="javascript:;" onclick="openConsult('春考培训咨询', '春考技能培训、文化课辅导，扫描二维码了解详情')">
+        <span class="bnav-icon">📞</span>
+        <span class="bnav-name">春考培训咨询</span>
+    </a>
+</nav>
+
+<div class="consult-overlay" id="consultOverlay">
+    <div class="consult-box">
+        <div class="consult-title" id="consultTitle"></div>
+        <div class="consult-text" id="consultText"></div>
+        <div class="consult-qr" id="consultQr"></div>
+        <div class="consult-hint">扫描二维码咨询</div>
+        <button class="consult-close" onclick="closeConsult()">✕</button>
+    </div>
+</div>
+
+<div class="footer" style="margin: 25px 0px 120px;text-align: center;color: var(--color-text-disabled);font-size: var(--font-size-caption);line-height: 1.6;">
+    <p><a href="https://beian.miit.gov.cn/">鲁ICP备18005196号-2</a> ｜ 访问人数：27,370 ｜ 访问次数：257,303</p>
+</div>
+
+<script>
+(function(){
+
+var LX_OPTIONS = {"1":{"name":"\u6625\u8003\u672c\u79d1","disabled":true,"end":true},"2":"\u6625\u8003\u4e13\u79d1"};
+var SITE_NAME  = "\u6625\u8003\u5fd7\u613f\u63a8\u8350";
+
+var schoolsData = [];
+var scoreRankData = {};
+
+var MORE_TAGS_LX1  = ['985','211','双一流','博士单位','硕士单位','保研资格','应用型本科'];
+var MORE_TAGS_REST = ['国家骨干','国家示范','双高计划'];
+var MORE_SSTAG = [];
+
+var uFs = localStorage.getItem('u_fs') || '';
+var uWc = localStorage.getItem('u_wc') || '';
+var uLb = readCookieLb();
+var uLx = readLx();
+
+function readCookieLb(){
+    var m = document.cookie.match(/(?:^|;\s*)lb=([^;]*)/);
+    if(m) return decodeURIComponent(m[1]);
+    return localStorage.getItem('u_lb') || '';
+}
+function readLx(){
+    var v = parseInt(localStorage.getItem('u_lx') || '0');
+    return isNaN(v) ? 0 : v;
+}
+function saveLb(lb){
+    localStorage.setItem('u_lb', lb);
+    var exp = new Date(Date.now() + 365*24*3600*1000).toUTCString();
+    document.cookie = 'lb=' + encodeURIComponent(lb) + '; path=/; expires=' + exp;
+}
+function saveLx(){ localStorage.setItem('u_lx', String(uLx)); }
+function getLxOption(lx){ return LX_OPTIONS[lx] || null; }
+function getLxName(lx){
+    var opt = getLxOption(lx);
+    return opt && typeof opt === 'object' ? (opt.name || '') : (opt || '');
+}
+function isLxEnded(lx){
+    var opt = getLxOption(lx);
+    return !!(opt && typeof opt === 'object' && opt.end);
+}
+
+var MAX_WISH_COUNT = 100;
+var wishList = readWish();
+function readWish(){
+    try{ var v=JSON.parse(localStorage.getItem('zy_wish')||'[]'); return Array.isArray(v)?v:[]; }
+    catch(e){ return []; }
+}
+function saveWish(){ localStorage.setItem('zy_wish', JSON.stringify(wishList)); }
+
+var filterT1   = '';
+var filterCs   = [];
+var filterMore = [];
+var filterKw   = [];
+var cwbTab     = 'chong';
+var curPage    = 1;
+var totalItems = 0;
+var kwTimer    = null;
+
+document.getElementById('uFs').value = uFs;
+document.getElementById('uWc').value = uWc;
+if(uLb) document.getElementById('uLb').value = uLb;
+document.querySelectorAll('.lx-card').forEach(function(card){
+    if(parseInt(card.dataset.lx) === uLx && !card.classList.contains('lx-card-disabled')) card.classList.add('selected');
+});
+
+var wcUserEdited = false;
+
+function applyWcFromMap(lb, fs){
+    if(wcUserEdited || !lb || !fs) return;
+    var map = scoreRankData[lb];
+    if(!map) return;
+    var wc = map[String(fs)];
+    if(wc) document.getElementById('uWc').value = wc;
+}
+
+document.getElementById('uLb').addEventListener('change', function(){
+    wcUserEdited = false;
+    var lb = this.value;
+    var fs = parseInt(document.getElementById('uFs').value.trim());
+    applyWcFromMap(lb, fs);
+});
+
+document.getElementById('uFs').addEventListener('input', function(){
+    wcUserEdited = false;
+    var fs = parseInt(this.value.trim());
+    var lb = document.getElementById('uLb').value;
+    if(!fs || !lb) return;
+    applyWcFromMap(lb, fs);
+});
+
+document.getElementById('uWc').addEventListener('input', function(){
+    wcUserEdited = true;
+});
+
+Promise.all([
+    fetch('data/schools.json').then(function(r){ return r.json(); }),
+    fetch('data/score-rank.json').then(function(r){ return r.json(); })
+]).then(function(results){
+    schoolsData = results[0];
+    scoreRankData = results[1];
+    if(uLb) applyWcFromMap(uLb, parseInt(uFs));
+    if(uFs && uWc && uLb && uLx) {
+        if(isLxEnded(uLx)) showEndedModal();
+        else enterResult();
+    }
+}).catch(function(){
+    console.error('Failed to load data files');
+});
+
+
+
+window.openComingModal = function(){
+    document.getElementById('comingModalOverlay').classList.add('show');
+};
+window.closeComingModal = function(){
+    document.getElementById('comingModalOverlay').classList.remove('show');
+};
+function showEndedModal(){
+    var endedName = getLxName(uLx);
+    document.getElementById('resultSection').style.display = 'none';
+    document.getElementById('formSection').style.display = 'block';
+    document.getElementById('fabSmart').style.display = 'flex';
+    document.getElementById('endedModalSub').textContent =
+        (endedName ? '“' + endedName + '”' : '您原先选择的志愿类别') + '已结束，请修改用户信息并重新选择。';
+    document.getElementById('endedModalOverlay').classList.add('show');
+}
+window.closeEndedModal = function(){
+    document.getElementById('endedModalOverlay').classList.remove('show');
+    uLx = 0;
+    localStorage.removeItem('u_lx');
+    document.querySelectorAll('.lx-card').forEach(function(c){ c.classList.remove('selected'); });
+    backToForm();
+};
+window.toggleLx = function(card){
+    document.querySelectorAll('.lx-card').forEach(function(c){ c.classList.remove('selected'); });
+    card.classList.add('selected');
+    uLx = parseInt(card.dataset.lx);
+    saveLx();
+};
+
+function collectAndSave(){
+    var fs = document.getElementById('uFs').value.trim();
+    var wc = document.getElementById('uWc').value.trim();
+    var lb = document.getElementById('uLb').value;
+    if(!fs || isNaN(+fs) || +fs<0 || +fs>750){ alert('请输入有效分数（0–750）'); return null; }
+    if(!wc || isNaN(+wc) || +wc<1)           { alert('请输入有效位次（正整数）'); return null; }
+    if(!lb)                                    { alert('请选择科目类别');          return null; }
+    if(!uLx)                                   { alert('请选择志愿类别');          return null; }
+    if(isLxEnded(uLx))                         { showEndedModal();                 return null; }
+    if(wishList.length > 0 && (fs !== String(uFs) || wc !== String(uWc) || lb !== uLb || uLx !== parseInt(localStorage.getItem('u_lx')||'0'))){
+        if(!confirm('分数/位次/类别已变更，原志愿表将被清空，是否继续？')) return null;
+        wishList = [];
+        saveWish();
+        updateFab();
+    }
+    localStorage.setItem('u_fs', fs);
+    localStorage.setItem('u_wc', wc);
+    saveLb(lb); saveLx();
+    uFs = fs; uWc = wc; uLb = lb;
+    return true;
+}
+
+window.doSmartBao = function(){
+    if(!collectAndSave()) return;
+    enterResult();
+};
+
+function enterResult(){
+    if(isLxEnded(uLx)) { showEndedModal(); return; }
+    document.getElementById('formSection').style.display  = 'none';
+    document.getElementById('fabSmart').style.display     = 'none';
+    document.getElementById('resultSection').style.display= 'block';
+    document.getElementById('fabWish').classList.add('show');
+
+    var lxName = getLxName(uLx);
+    document.getElementById('rBarMain').textContent =
+        lxName + ' · ' + (uLb||'');
+    document.getElementById('rBarSub').textContent =
+        ' · ' + Number(uWc).toLocaleString() + ' 名';
+
+    renderMoreChips();
+    renderActiveFilters();
+    fetchSchools(1);
+    updateFab();
+}
+
+window.backToForm = function(){
+    document.getElementById('resultSection').style.display = 'none';
+    document.getElementById('fabWish').classList.remove('show');
+    document.getElementById('formSection').style.display   = 'block';
+    document.getElementById('fabSmart').style.display      = 'flex';
+};
+
+window.setChip = function(el, type){
+    if(type === 'cs'){
+        var val = el.dataset.cs;
+        var allChip = document.querySelector('#csChips .chip[data-cs=""]');
+        if(val === ''){
+            filterCs = [];
+            document.querySelectorAll('#csChips .chip').forEach(function(c){ c.classList.remove('active'); });
+            allChip.classList.add('active');
+        } else {
+            var idx = filterCs.indexOf(val);
+            if(idx !== -1){ filterCs.splice(idx, 1); el.classList.remove('active'); }
+            else { filterCs.push(val); el.classList.add('active'); }
+            if(allChip) allChip.classList.toggle('active', filterCs.length === 0);
+        }
+    } else {
+        el.closest('.filter-chips, .filter-chips-scroll').querySelectorAll('.chip').forEach(function(c){ c.classList.remove('active'); });
+        el.classList.add('active');
+        if(type === 't1') filterT1 = el.dataset.t1;
+    }
+    renderActiveFilters();
+    doFilter();
+};
+
+function renderMoreChips(){
+    var tags = MORE_SSTAG.concat(uLx === 1 ? MORE_TAGS_LX1 : MORE_TAGS_REST);
+    var row  = document.getElementById('moreChipsRow');
+    var html = '<span class="chip active" data-more="" onclick="clearMore(this)">全部</span>';
+    tags.forEach(function(t){
+        html += '<span class="chip" data-more="'+t+'" onclick="toggleMore(this)">'+t+'</span>';
+    });
+    row.innerHTML = html;
+    filterMore = [];
+}
+
+window.toggleMore = function(el){
+    var tag = el.dataset.more;
+    el.classList.toggle('active');
+    var idx = filterMore.indexOf(tag);
+    if(idx !== -1) filterMore.splice(idx,1);
+    else filterMore.push(tag);
+    var allBtn = document.querySelector('#moreChipsRow .chip[data-more=""]');
+    if(allBtn) allBtn.classList.toggle('active', filterMore.length === 0);
+    renderActiveFilters();
+    doFilter();
+};
+window.clearMore = function(el){
+    filterMore = [];
+    document.querySelectorAll('#moreChipsRow .chip').forEach(function(c){ c.classList.remove('active'); });
+    el.classList.add('active');
+    renderActiveFilters();
+    doFilter();
+};
+window.doFilter = function(){
+    fetchSchools(1);
+};
+document.getElementById('kw').addEventListener('keydown', function(e){
+    if(e.key === 'Enter' || e.key === ','){
+        e.preventDefault();
+        var v = this.value.trim();
+        if(v && filterKw.indexOf(v) === -1){
+            filterKw.push(v);
+            renderKwPills();
+            renderActiveFilters();
+            fetchSchools(1);
+        }
+        this.value = '';
+    } else if(e.key === 'Backspace' && this.value === '' && filterKw.length > 0){
+        filterKw.pop();
+        renderKwPills();
+        renderActiveFilters();
+        fetchSchools(1);
+    }
+});
+document.getElementById('kwTagWrap').addEventListener('click', function(){
+    document.getElementById('kw').focus();
+});
+function renderKwPills(){
+    var wrap = document.getElementById('kwTags');
+    var html = '';
+    filterKw.forEach(function(kw){
+        html += '<span class="kw-pill">'+esc(kw)+
+            '<button class="kw-pill-x" onclick="removeKwPill(\''+kw.replace(/'/g,"\\'")+'\')" type="button">✕</button></span>';
+    });
+    wrap.innerHTML = html;
+    document.getElementById('kw').placeholder = filterKw.length > 0 ? '' : '输入关键词回车添加…';
+}
+window.removeKwPill = function(kw){
+    var idx = filterKw.indexOf(kw);
+    if(idx !== -1) filterKw.splice(idx, 1);
+    renderKwPills();
+    renderActiveFilters();
+    fetchSchools(1);
+};
+window.clearKw = function(){
+    filterKw = [];
+    document.getElementById('kw').value = '';
+    renderKwPills();
+    renderActiveFilters();
+    fetchSchools(1);
+};
+
+function renderActiveFilters(){
+    var wrap = document.getElementById('activeFilters');
+    var tags = [];
+    var t1Labels = {'1':'公办', '2':'民办'};
+    if(filterT1) tags.push({label: t1Labels[filterT1]||filterT1, action:'removeT1'});
+    filterCs.forEach(function(c){ tags.push({label: c, action:'removeCs:'+c}); });
+    filterMore.forEach(function(m){ tags.push({label: m, action:'removeMore:'+m}); });
+    filterKw.forEach(function(k){ tags.push({label: '搜索: '+k, action:'removeKw:'+k}); });
+    if(!tags.length){ wrap.classList.remove('show'); wrap.innerHTML=''; return; }
+    var html = '';
+    tags.forEach(function(t){
+        html += '<span class="af-tag">'+esc(t.label)+
+            '<button class="af-tag-x" onclick="removeFilter(\''+t.action+'\')">✕</button></span>';
+    });
+    wrap.innerHTML = html;
+    wrap.classList.add('show');
+}
+window.removeFilter = function(action){
+    if(action === 'removeT1'){
+        filterT1 = '';
+        document.querySelectorAll('.filter-chips .chip[data-t1]').forEach(function(c){ c.classList.toggle('active', c.dataset.t1===''); });
+    } else if(action.indexOf('removeCs:') === 0){
+        var cv = action.slice(9);
+        var ci = filterCs.indexOf(cv);
+        if(ci !== -1) filterCs.splice(ci, 1);
+        document.querySelectorAll('#csChips .chip').forEach(function(c){
+            if(c.dataset.cs === cv) c.classList.remove('active');
+            if(c.dataset.cs === '') c.classList.toggle('active', filterCs.length === 0);
+        });
+    } else if(action.indexOf('removeKw:') === 0){
+        var kv = action.slice(9);
+        var ki = filterKw.indexOf(kv);
+        if(ki !== -1) filterKw.splice(ki, 1);
+        renderKwPills();
+    } else if(action.indexOf('removeMore:') === 0){
+        var tag = action.slice(11);
+        var idx = filterMore.indexOf(tag);
+        if(idx !== -1) filterMore.splice(idx,1);
+        document.querySelectorAll('#moreChipsRow .chip').forEach(function(c){
+            if(c.dataset.more === tag) c.classList.remove('active');
+            if(c.dataset.more === '' && filterMore.length === 0) c.classList.add('active');
+        });
+    }
+    renderActiveFilters();
+    fetchSchools(1);
+};
+window.setCwbTab = function(el){
+    document.querySelectorAll('.cwb-tab').forEach(function(t){ t.classList.remove('active'); });
+    el.classList.add('active');
+    cwbTab = el.dataset.tab;
+    fetchSchools(1);
+};
+
+function fetchSchools(page){
+    curPage = page;
+    document.getElementById('schoolList').innerHTML = '<div class="g-loading"><div class="g-spin"></div>加载中…</div>';
+    document.getElementById('pagerWrap').innerHTML  = '';
+
+    var userWc = parseInt(uWc) || 0;
+
+    var filtered = schoolsData.filter(function(item){
+        if(item.category !== uLb) return false;
+        if(filterT1){
+            var itemType = item.type === 'public' ? '1' : (item.type === 'private' ? '2' : '');
+            if(itemType !== filterT1) return false;
+        }
+        if(filterCs.length > 0 && filterCs.indexOf(item.city) === -1) return false;
+        if(filterMore.length > 0){
+            var levelMap = {'doubleHigh': '双高计划', 'nationalKey': '国家骨干', 'nationalDemo': '国家示范'};
+            var itemLevel = levelMap[item.level] || '';
+            if(filterMore.indexOf(itemLevel) === -1) return false;
+        }
+        if(filterKw.length > 0){
+            var text = (item.name + ' ' + item.major).toLowerCase();
+            var match = filterKw.every(function(kw){ return text.indexOf(kw.toLowerCase()) !== -1; });
+            if(!match) return false;
+        }
+        return true;
+    });
+
+    filtered.forEach(function(item){
+        var lastRank = parseInt(item.lastRank) || 0;
+        var rankDiff = lastRank - userWc;
+        var ratio = userWc > 0 ? lastRank / userWc : 0;
+
+        if(ratio >= 0.9 && ratio <= 1.15){
+            item.tag = 'wen';
+        } else if(ratio > 1.15 && ratio <= 1.4){
+            item.tag = 'bao';
+        } else if(ratio < 0.9){
+            item.tag = 'chong';
+        } else {
+            item.tag = 'bao';
+        }
+    });
+
+    var counts = {chong: 0, wen: 0, bao: 0};
+    filtered.forEach(function(item){ counts[item.tag]++; });
+
+    var tabFiltered = filtered.filter(function(item){ return item.tag === cwbTab; });
+
+    tabFiltered.sort(function(a, b){
+        var rankA = parseInt(a.lastRank) || 0;
+        var rankB = parseInt(b.lastRank) || 0;
+        if(cwbTab === 'chong') return rankA - rankB;
+        return rankB - rankA;
+    });
+
+    var pageSize = 20;
+    var start = (page - 1) * pageSize;
+    var end = start + pageSize;
+    var pageData = tabFiltered.slice(start, end);
+
+    var resultList = pageData.map(function(item){
+        return {
+            xxid: item.id,
+            xxcode: item.code,
+            xx: item.name,
+            t1: item.type === 'public' ? 1 : 2,
+            cs: item.city,
+            zycode: item.majorCode,
+            zy: item.major,
+            jh: item.plan,
+            xf: item.tuition,
+            fs: item.lastScore || '--',
+            wc: item.lastRank || '--',
+            tag: item.tag,
+            bz: '',
+            vr: ''
+        };
+    });
+
+    totalItems = tabFiltered.length;
+    document.getElementById('countChong').textContent = counts.chong;
+    document.getElementById('countWen').textContent   = counts.wen;
+    document.getElementById('countBao').textContent   = counts.bao;
+    renderSchools(resultList);
+    renderPager(page, Math.ceil(totalItems / pageSize));
+}
+
+function isSameWishItem(a, b){
+    if(!a || !b) return false;
+    return String(a.xxid || '') === String(b.xxid || '') &&
+        String(a.zy || '') === String(b.zy || '') &&
+        String(a.zycode || '').trim() === String(b.zycode || '').trim();
+}
+
+function renderSchools(list){
+    var el = document.getElementById('schoolList');
+    if(!list||!list.length){ el.innerHTML='<div class="g-empty">暂无数据</div>'; return; }
+    var visibleList = list;
+    var tagNames  = {chong:'冲', wen:'稳', bao:'保'};
+    var html = '';
+    visibleList.forEach(function(item, idx){
+        var inWish  = wishList.some(function(w){ return isSameWishItem(w, item); });
+        var t1Label = item.t1==1 ? '公办' : (item.t1==2 ? '民办' : '');
+        var t1Cls   = item.t1==1 ? 'gongban' : 'minban';
+        var logoHtml = item.logo
+            ? '<img src="https://m.yiluqu.cn/f-xh/xh/'+esc(item.logo)+'" alt="" onerror="this.style.display=\'none\'">'
+            : '🏫';
+        html +=
+            '<div class="school-card">' +
+                '<div class="school-logo">' + logoHtml + '</div>' +
+                '<div class="school-main">' +
+                    '<div class="school-name-row">' +
+                        (item.xxcode ? '<span style="font-size:15px;color:var(--color-text-disabled);font-weight:var(--font-weight-semibold);flex-shrink:0;">'+esc(item.xxcode)+'</span>' : '') +
+                        '<span class="school-name">'+esc(item.xx)+'</span>' +
+                        (t1Label ? '<span class="school-badge '+t1Cls+'">'+t1Label+'</span>' : '') +
+                        (item.cs ? '<span class="school-tag">'+esc(item.cs)+'</span>' : '') +
+                    '</div>' +
+                    '<div class="school-info-box">' +
+                        '<div class="school-zy">'+(item.zycode ? '<span style="color:var(--color-text-disabled);font-size:14px;font-weight:var(--font-weight-semibold);">'+esc(item.zycode)+'</span> ' : '')+esc(item.zy)+(item.bz ? ' <span style="color:var(--color-text-disabled);font-size:13px;font-weight:400;">'+esc(item.bz)+'</span>' : '')+'</div>' +
+                        '<div class="school-meta">' +
+                            '<div class="school-stat"><div class="school-stat-val">'+(item.jh||'--')+'</div><div class="school-stat-key">招生计划</div></div>' +
+                            '<div class="school-stat"><div class="school-stat-val">'+(item.xf ? item.xf+' ' : '--')+'</div><div class="school-stat-key">学费/年</div></div>' +
+                            '<div class="school-stat"><div class="school-stat-val">'+(item.fs||'--')+'</div><div class="school-stat-key">去年最低分</div></div>' +
+                            '<div class="school-stat"><div class="school-stat-val">'+(item.wc && !isNaN(parseInt(item.wc)) ? parseInt(item.wc).toLocaleString() : '--')+'</div><div class="school-stat-key">去年最低位次</div></div>' +
+                        '</div>' +
+                    '</div>' +
+                    '<div class="add-btn-wrap">' +
+                        '<button class="add-btn tag-'+item.tag+(inWish?' added':'') +'" data-idx="'+idx+'">' +
+                            '<span class="add-btn-inner-tag">'+tagNames[item.tag]+'</span>' +
+                            (inWish ? '已加入志愿表' : '添加到志愿表') +
+                        '</button>' +
+                        (item.vr ? '<a class="vr-btn" href="'+esc(item.vr)+'" target="_blank" rel="noopener">🥽 VR校园</a>' : '') +
+                    '</div>' +
+                '</div>' +
+            '</div>';
+    });
+
+    el.innerHTML = html;
+
+    el.querySelectorAll('.add-btn').forEach(function(btn){
+        btn.addEventListener('click', function(){
+            var item = visibleList[parseInt(this.dataset.idx)];
+            toggleWish(this, item);
+        });
+    });
+}
+
+function renderPager(cur, total){
+    var wrap = document.getElementById('pagerWrap');
+    if(total <= 1){ wrap.innerHTML=''; return; }
+    var html = '<div class="pager">';
+    html += '<button class="page-btn" id="pgPrev"'+(cur<=1?' disabled':'')+'>‹</button>';
+    var start=Math.max(1,cur-2), end=Math.min(total,start+4);
+    start=Math.max(1,end-4);
+    if(start>1) html+='<button class="page-btn" data-p="1">1</button><span class="page-info-text">…</span>';
+    for(var p=start;p<=end;p++) html+='<button class="page-btn'+(p===cur?' active':'')+'" data-p="'+p+'">'+p+'</button>';
+    if(end<total) html+='<span class="page-info-text">…</span><button class="page-btn" data-p="'+total+'">'+total+'</button>';
+    html+='<button class="page-btn" id="pgNext"'+(cur>=total?' disabled':'')+'>›</button>';
+    html+='<span class="page-info-text">共'+totalItems+'条</span>';
+    html+='</div>';
+    wrap.innerHTML=html;
+    wrap.querySelector('#pgPrev').addEventListener('click',function(){ if(cur>1) fetchSchools(cur-1); });
+    wrap.querySelector('#pgNext').addEventListener('click',function(){ if(cur<total) fetchSchools(cur+1); });
+    wrap.querySelectorAll('[data-p]').forEach(function(btn){
+        btn.addEventListener('click',function(){ fetchSchools(parseInt(this.dataset.p)); window.scrollTo({top:0,behavior:'smooth'}); });
+    });
+}
+
+function toggleWish(btn, item){
+    var idx = wishList.findIndex(function(w){ return isSameWishItem(w, item); });
+    if(idx !== -1){
+        wishList.splice(idx,1);
+        btn.classList.remove('added');
+        btn.innerHTML = '<span class="add-btn-inner-tag">'+{chong:'冲',wen:'稳',bao:'保'}[item.tag]+'</span>添加到志愿表';
+    } else {
+        if(wishList.length >= MAX_WISH_COUNT){
+            alert('志愿表最多只能添加' + MAX_WISH_COUNT + '条');
+            return;
+        }
+        wishList.push({
+            xxid:item.xxid, xxcode:item.xxcode, xx:item.xx,
+            zycode:item.zycode, zy:item.zy,
+            t1:item.t1, cs:item.cs,
+            jh:item.jh, xf:item.xf, fs:item.fs, wc:item.wc,
+            tag:item.tag
+        });
+        btn.classList.add('added');
+        btn.innerHTML = '<span class="add-btn-inner-tag">'+{chong:'冲',wen:'稳',bao:'保'}[item.tag]+'</span>已加入志愿表';
+    }
+    saveWish();
+    updateFab();
+}
+
+window.openWishSheet = function(){
+    var o = document.getElementById('wishSheetOverlay');
+    o.classList.add('show');
+    requestAnimationFrame(function(){ requestAnimationFrame(function(){ o.classList.add('visible'); }); });
+    renderWishSheet();
+};
+window.closeWishSheet = function(){
+    var o = document.getElementById('wishSheetOverlay');
+    o.classList.remove('visible');
+    setTimeout(function(){ o.classList.remove('show'); },350);
+};
+document.getElementById('wishSheetOverlay').addEventListener('click',function(e){ if(e.target===this) closeWishSheet(); });
+
+function renderWishSheet(){
+    var el = document.getElementById('wishListEl');
+    if(!wishList.length){ el.innerHTML='<div class="wish-empty">暂未添加志愿</div>'; return; }
+    var tagNames = {chong:'冲',wen:'稳',bao:'保'};
+    var html='';
+    wishList.forEach(function(w,i){
+        html+=
+            '<div class="wish-item">' +
+                '<div class="wish-order">'+(i+1)+'</div>' +
+                '<div class="wish-tag-dot '+w.tag+'"></div>' +
+                '<div class="wish-info">' +
+                    '<div class="wish-xx">'+esc(w.xx)+'</div>' +
+                    '<div class="wish-zy">'+esc(w.zy)+' · <span style="color:'+(w.tag==='chong'?'var(--color-risk)':w.tag==='wen'?'var(--color-warning)':'var(--color-safe)')+'">'+tagNames[w.tag]+'</span></div>' +
+                '</div>' +
+                '<button class="wish-remove-btn" data-i="'+i+'">删除</button>' +
+            '</div>';
+    });
+    el.innerHTML=html;
+    el.querySelectorAll('.wish-remove-btn').forEach(function(btn){
+        btn.addEventListener('click',function(){
+            wishList.splice(parseInt(this.dataset.i),1);
+            saveWish(); renderWishSheet(); updateFab();
+            fetchSchools(curPage);
+        });
+    });
+}
+window.clearAllWish = function(){
+    if(!wishList.length||!confirm('确定清空所有志愿吗？')) return;
+    wishList=[];
+    saveWish(); renderWishSheet(); updateFab();
+    fetchSchools(curPage);
+};
+
+function updateFab(){
+    var n = wishList.length;
+    var badge = document.getElementById('fabBadge');
+    badge.textContent = n;
+    badge.style.display = n>0 ? 'flex' : 'none';
+}
+
+window.exportWish = function(){
+    if(!wishList.length){ alert('志愿表为空，无法导出'); return; }
+    var tagNames = {chong:'冲', wen:'稳', bao:'保'};
+    var t1Names  = {'1':'公办', '2':'民办'};
+    var rows = [
+        ['2026春考志愿推荐'],
+        ['志愿推荐仅供参考，不作为录取依据'],
+        ['序号','学校代码','学校','属性','地区','专业代码','专业','计划','学费','冲稳保'],
+    ];
+    wishList.forEach(function(w, i){
+        rows.push([
+            i+1,
+            w.xxcode || '',
+            w.xx     || '',
+            t1Names[String(w.t1)] || '',
+            w.cs     || '',
+            w.zycode || '',
+            w.zy     || '',
+            w.jh     || '',
+            w.xf     || '',
+            tagNames[w.tag] || '',
+        ]);
+    });
+    var csv = '﻿' + rows.map(function(r){
+        return r.map(function(v){
+            var s = String(v);
+            if(s.indexOf(',')!==-1 || s.indexOf('"')!==-1 || s.indexOf('\n')!==-1)
+                s = '"' + s.replace(/"/g,'""') + '"';
+            return s;
+        }).join(',');
+    }).join('\r\n');
+    var blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+    var url  = URL.createObjectURL(blob);
+    var a    = document.createElement('a');
+    a.href   = url;
+    a.download = '志愿表.csv';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+};
+
+window.openConsult = function(title, text){
+    var overlay = document.getElementById('consultOverlay');
+    document.getElementById('consultTitle').textContent = title;
+    document.getElementById('consultText').textContent = text;
+    overlay.classList.add('show');
+    requestAnimationFrame(function(){
+        requestAnimationFrame(function(){
+            overlay.classList.add('visible');
+        });
+    });
+};
+
+window.closeConsult = function(){
+    var overlay = document.getElementById('consultOverlay');
+    overlay.classList.remove('visible');
+    setTimeout(function(){
+        overlay.classList.remove('show');
+    }, 300);
+};
+
+function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+['uFs','uWc'].forEach(function(id){
+    document.getElementById(id).addEventListener('keydown',function(e){ if(e.key==='Enter') doSmartBao(); });
+});
+
+})();
+</script>
+</body>
+</html>
